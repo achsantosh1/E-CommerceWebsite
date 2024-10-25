@@ -1,0 +1,36 @@
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px;
+    
+  
+    .search-input {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      height: 30px;
+      max-width: 150px;
+      padding: 8px 12px;
+      width: 100%;
+      transition: border-color 0.3s ease;
+  
+      &:focus {
+        outline: none;
+        border-color: #6b7280; // Example focus color
+      }
+    }
+  
+    .search-icon {
+      font-size: 1.5rem;
+      margin-left: 8px;
+      color: #02040a;
+      cursor: pointer;
+      transition: color 0.3s ease;
+  
+      &:hover {
+        color: #4b5563; // Example hover color
+      }
+    }
+  }
+  
