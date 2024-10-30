@@ -5,6 +5,54 @@
     margin: 20px;
     padding: 5px;
   }
+  .sort{
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+      .lowtohigh{
+
+      }
+      .hightolow{
+
+      }
+      .AtoZ{
+
+      }
+      .ZtoA{
+
+      }
+      .category-dropdown {
+        margin: 1rem 0;
+      
+        label {
+          margin-right: 0.5rem;
+          font-weight: bold;
+        }
+      
+        select {
+          padding: 0.5rem;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          font-size: 1rem;
+          cursor: pointer;
+      
+          
+          &:focus {
+            outline: none;
+            border-color: #007bff; 
+          }
+      
+       
+          option {
+            padding: 0.5rem;
+            background-color: #fff; 
+            color: #333;
+          }
+        }
+      }
+      
+
+  }
   .flex {
 
     display: flex;

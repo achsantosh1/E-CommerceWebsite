@@ -1,8 +1,132 @@
 .footer {
-    bottom: 0;
-    width: 100%;
-    background-color: #333;
-    color: #fff;
-    padding: 12px;
-    text-align: center;
+  // height: 500px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  font-size: 13px;
+  color: #ccc;
+  border-top: 1px solid #f5f5f5;
+  width: 100%;
+  // background-color: #333;
+  .container {
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    .row {
+      display: flex;
+      // justify-content: space-between;
+      // gap: 500px;
+    }
+    .col1 {
+      width: 33.333333%;
+      .col1_section {
+        display: flex;
+        flex-direction: column;
+        gap: 80px;
+
+        h3 {
+          font-size: 30px;
+          color: black;
+        }
+        .col1_section_form {
+          display: flex;
+          gap: 5px;
+          input {
+            height: 50px;
+            width: 250px;
+            border: 1px solid rgb(230, 223, 223);
+            background: transparent;
+            color: black;
+            text-align: center;
+          }
+
+          button {
+            height: 50px;
+            width: 65px;
+          }
+        }
+
+        p {
+          color: black;
+          font-size: 14px;
+          height: 50px;
+          width: 400px;
+        }
+      }
+    }
+    .col2 {
+      margin-left: 50px;
+      .main_footer {
+        .footer_contact {
+          .contacts {
+            .row1 {
+              display: flex;
+              gap: 150px;
+              .contactdetails {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+
+                .footer_contact_item {
+                  font-size: 13px;
+                  text-decoration: none;
+
+                  a {
+                    text-decoration: none;
+                    color: red;
+                  }
+                }
+                a {
+                  color: red;
+                }
+                .social_list {
+                  margin-top: 15px;
+                  .social_list_item {
+                    display: flex;
+                    gap: 25px;
+                    .social_links {
+                      color: red;
+                    }
+                  }
+                }
+              }
+              .qrlinks {
+                .downloadnow {
+                  h6{
+                    font-size: 25px;
+                    color: black;
+                    margin-bottom: 20px;
+                  }
+                  .donwload_image {
+                    display: flex;
+                    gap: 20px;
+                    .qrimage {
+                      img{
+
+                        height: 120px;
+                      }
+
+                    }
+                    .store {
+                      display: flex;
+                      flex-direction: column;
+                      gap: 20px;
+                      .playstore {
+                        .app_image {
+                        }
+                      }
+                      .appstore {
+                        .app_image {
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
+}
