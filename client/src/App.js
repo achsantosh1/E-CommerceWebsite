@@ -3,10 +3,12 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import Shop from "./Pages/Shop";
 import ShopCategory from "./Pages/ShopCategory";
-import Product from "./Pages/Product";
+
 import Cart from "./Pages/Cart";
 import LoginSignup from "./Pages/LoginSignup";
 import Footer from "./Components/Footer/Footer";
+import SingleProduct from "./Components/SingleProduct/SingleProduct";
+import ProductList from "./Components/ProductList/ProductList";
 
 
 const MainLayout = () => (
@@ -39,13 +41,15 @@ const router = createBrowserRouter([
       //   path: "kids",
       //   element: <ShopCategory category="kid" />,
       // },
-      {
-        path: "product/:productId",
-        element: <Product />,
+      { path: "/", 
+        element: <ProductList /> 
+      },
+      { path: "/product/:productId", 
+        element: <SingleProduct /> 
       },
       {
         path: "cart",
-        element: <Cart />,
+        element: <Cart/>,
       },
       {
         path: "login",

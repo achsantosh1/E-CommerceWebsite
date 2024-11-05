@@ -1,0 +1,40 @@
+.product-detail{
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    .product-image-section{
+        .main-image{
+            img{
+                border-radius: 5px;
+                margin-top: 25px;
+
+                // margin-left: 50%;
+                height: 500px;
+                width: 500px;
+            }
+        }
+    }
+
+    .product-info{
+
+        .description{}
+
+        .color-options{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            .color-list{
+                display: flex;
+                gap: 5px;
+            }
+            .color-swatch{
+                
+                border-radius: 50%;
+                img{
+                    display: none;
+                }
+            }
+        }
+    }
+}

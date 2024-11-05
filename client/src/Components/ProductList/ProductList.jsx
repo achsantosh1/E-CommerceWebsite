@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./ProductList.scss";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 
 const ProductList = () => {
@@ -112,16 +113,17 @@ const ProductList = () => {
         {filteredData.map((product) => {
           const { _id, name, description, price, photo } = product;
           return (
-            <div className="card" key={_id}>
-              <div className="card-image">
-                <img src={photo} alt="" />
+            <Link to={`/product/${_id}`} key={_id} className="card-link">
+              <div className="card">
+                <div className="card-image">
+                  <img src={photo} alt={name} />
+                </div>
+                <div className="card-name">
+                  <h2>{name}</h2>
+                </div>
+                <span>Price: ${price}</span>
               </div>
-              <div className="card-name">
-                <h2>{name}</h2>
-              </div>
-              {/* <p>{description}</p> */}
-              <span>Price: ${price}</span>
-            </div>
+            </Link>
           );
         })}
       </div>
