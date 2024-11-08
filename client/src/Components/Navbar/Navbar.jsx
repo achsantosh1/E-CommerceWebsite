@@ -1,5 +1,5 @@
 import "./navbar.scss";
-import logo from "../Assets/logo.png";
+import logo from "../Assets/logo.webp";
 import cart_icon from "../Assets/cart_icon.png";
 import { useState } from "react";
 import { Link } from "react-router-dom";

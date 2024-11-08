@@ -50,24 +50,24 @@ const ProductList = () => {
   if (loading) return <div>Loading...</div>;
 
   const hightolow = () => {
-    const sorted = [...filteredData].sort((a, b) => b.price - a.price);
+    const sorted = [...myData].sort((a, b) => b.price - a.price);
     setMyData(sorted);
   };
 
   const lowtohigh = () => {
-    const sorted = [...filteredData].sort((a, b) => a.price - b.price);
+    const sorted = [...myData].sort((a, b) => a.price - b.price);
     setMyData(sorted);
   };
 
   const AtoZ = () => {
-    const sorted = [...filteredData].sort((a, b) =>
+    const sorted = [...myData].sort((a, b) =>
       a.name.localeCompare(b.name)
     );
     setMyData(sorted);
   };
 
   const ZtoA = () => {
-    const sorted = [...filteredData].sort((a, b) =>
+    const sorted = [...myData].sort((a, b) =>
       b.name.localeCompare(a.name)
     );
     setMyData(sorted);
@@ -109,19 +109,19 @@ const ProductList = () => {
         </div>
       </div>
 
-      <div className="flex">
+      <div className="cart-container">
         {filteredData.map((product) => {
-          const { _id, name, description, price, photo } = product;
+          const { _id, name, price, photo } = product;
           return (
             <Link to={`/product/${_id}`} key={_id} className="card-link">
-              <div className="card">
+              <div className="card-item">
                 <div className="card-image">
                   <img src={photo} alt={name} />
                 </div>
                 <div className="card-name">
                   <h2>{name}</h2>
                 </div>
-                <span>Price: ${price}</span>
+                <span className="card-price">Price: ${price}</span>
               </div>
             </Link>
           );
