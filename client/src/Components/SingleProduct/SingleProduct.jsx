@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./singleproduct.scss";
-import { Link } from "react-router-dom";
+import { CartContext } from "../../Features/ContextProvider";
+
 
 const SingleProduct = () => {
+
+const {dispatch}= useContext(CartContext);
+
   const { productId } = useParams();
   const [products, setProducts] = useState([]);
   const [product, setProduct] = useState(null);
@@ -12,6 +16,7 @@ const SingleProduct = () => {
   const [isError, setIsError] = useState("");
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState(null);
 
   const fetchAllProducts = async () => {
     try {
@@ -41,7 +46,14 @@ const SingleProduct = () => {
     fetchAllProducts();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
   if (isError) return <div className="error">{isError}</div>;
 
   // Destructure product properties
@@ -66,6 +78,25 @@ const SingleProduct = () => {
     .filter((line) => line.trim() !== "")
     .map((line) => line.replace(/^-+\s*/, "").trim());
 
+     // Handle Color Selection
+  const handleColorSelect = (color) => {
+    setSelectedColor(color);
+    setSelectedImage(color.link);  // Update the main image to match the selected color
+  };
+
+  const handleAddToCart = () => {
+    console.log("Selected Color:", selectedColor);
+    if (!selectedColor) {
+      alert("Please select a color before adding to the cart");
+      return;
+    }
+
+    dispatch({
+      type: "AddOrUpdate",
+      product: { ...product, quantity, color: selectedColor },
+    });
+    }
+
   return (
     <div className="product-detail">
       <div className="product-image-section">
@@ -75,19 +106,7 @@ const SingleProduct = () => {
             alt={name || "Product"}
           />
         </div>
-        {/* <div className="image-thumbnails">
-          {[photo, photo1, photo2].map((img, idx) => (
-            img && (
-              <img
-                key={idx}
-                src={img}
-                alt={`${name} thumbnail ${idx + 1}`}
-                onClick={() => setSelectedImage(img)}
-                className={selectedImage === img ? "selected" : ""}
-              />
-            )
-          ))}
-        </div> */}
+        
       </div>
 
       <div className="product-info">
@@ -106,7 +125,7 @@ const SingleProduct = () => {
           <div className="quantity">
             <p>Quantity:</p> <br />
             <button onClick={() => handleQuantityChange(-1)}>-</button>
-            <input type="number" value={quantity} readOnly />
+            <input type="number" value={quantity} />
             <button onClick={() => handleQuantityChange(1)}>+</button>
           </div>
         </div>
@@ -121,16 +140,18 @@ const SingleProduct = () => {
                   className="color-swatch"
                   style={{
                     backgroundColor: color.color,
-                    height: 50,
-                    width: 50,
+                  
                   }}
-                  onClick={() => setSelectedImage(color.link)}
+                  onClick={() =>handleColorSelect(color)}
                 >
                   <img
                     src={color.link}
                     alt={color.color}
                     className="color-image"
                   />
+                  {selectedColor?._id === color._id && (
+          <div className="checkmark">&#10003;</div> 
+        )}
                 </div>
               ))
             ) : (
@@ -138,7 +159,14 @@ const SingleProduct = () => {
             )}
           </div>
           <div className="add_cart">
-            <button className="addtocart">Add To Cart</button>
+          <button
+              className="addtocart"
+              onClick={handleAddToCart}  // Call the function that checks color selection
+              alert={!selectedColor}  // Disable the button if no color is selected
+            >
+              Add To Cart
+            </button>
+            
             <button className="checkout">Buy Now</button>
           </div>
         </div>

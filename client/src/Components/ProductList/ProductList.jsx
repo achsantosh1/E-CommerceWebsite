@@ -3,7 +3,6 @@ import "./ProductList.scss";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-
 const ProductList = () => {
   const [myData, setMyData] = useState([]);
   const [category, setCategories] = useState([]);
@@ -14,11 +13,9 @@ const ProductList = () => {
   const getMyPostData = async () => {
     try {
       const res = await axios.get("/api/v1/product/get-product");
-
-      // console.log(res.data.products);
       setMyData(res.data.products);
     } catch (error) {
-      setIsError(error.message);
+      setIsError("Error fetching product data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -27,12 +24,9 @@ const ProductList = () => {
   const getCategoriesData = async () => {
     try {
       const res = await axios.get("/api/v1/category/get-category");
-
-      // console.log(res.data.category)
-
       setCategories([{ _id: "all", name: "All" }, ...res.data.category]);
     } catch (error) {
-      setIsError(error.message);
+      setIsError("Error fetching categories: " + error.message);
     }
   };
 
@@ -41,55 +35,59 @@ const ProductList = () => {
     getCategoriesData();
   }, []);
 
+  // Filtered and sorted data
   const filteredData = myData.filter((product) =>
     selectedCategory === "all"
       ? true
       : product.category._id.toLowerCase() === selectedCategory.toLowerCase()
   );
 
-  if (loading) return <div>Loading...</div>;
-
-  const hightolow = () => {
-    const sorted = [...myData].sort((a, b) => b.price - a.price);
-    setMyData(sorted);
+  // Sorting Functions
+  const sortHighToLow = () => {
+    setMyData((prevData) => [...prevData].sort((a, b) => b.price - a.price));
   };
 
-  const lowtohigh = () => {
-    const sorted = [...myData].sort((a, b) => a.price - b.price);
-    setMyData(sorted);
+  const sortLowToHigh = () => {
+    setMyData((prevData) => [...prevData].sort((a, b) => a.price - b.price));
   };
 
-  const AtoZ = () => {
-    const sorted = [...myData].sort((a, b) =>
-      a.name.localeCompare(b.name)
+  const sortAtoZ = () => {
+    setMyData((prevData) =>
+      [...prevData].sort((a, b) => a.name.localeCompare(b.name))
     );
-    setMyData(sorted);
   };
 
-  const ZtoA = () => {
-    const sorted = [...myData].sort((a, b) =>
-      b.name.localeCompare(a.name)
+  const sortZtoA = () => {
+    setMyData((prevData) =>
+      [...prevData].sort((a, b) => b.name.localeCompare(a.name))
     );
-    setMyData(sorted);
   };
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="product-list">
       <h1>Product List</h1>
-      {isError && <div className="error">Error: {isError}</div>}
+      {isError && <div className="error">{isError}</div>}
 
       <div className="sort">
-        <button className="hightolow" onClick={hightolow}>
+        <button className="hightolow" onClick={sortHighToLow}>
           Sort By Price (High to Low)
         </button>
-        <button className="lowtohigh" onClick={lowtohigh}>
-          Sort By Price (Low to high)
+        <button className="lowtohigh" onClick={sortLowToHigh}>
+          Sort By Price (Low to High)
         </button>
-        <button className="AtoZ" onClick={AtoZ}>
-          {" "}
+        <button className="AtoZ" onClick={sortAtoZ}>
           Sort By Name (A-to-Z)
         </button>
-        <button className="ZtoA" onClick={ZtoA}>
+        <button className="ZtoA" onClick={sortZtoA}>
           Sort By Name (Z-to-A)
         </button>
 

@@ -1,21 +1,22 @@
 import "./navbar.scss";
 import logo from "../Assets/logo.webp";
 import cart_icon from "../Assets/cart_icon.png";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineMenu } from "react-icons/ai";
 
 import SearchComponent from "../SearchComponent/SearchComponent";
-
+import { CartContext } from "../../Features/ContextProvider";
 
 const Navbar = () => {
+  const { cart } = useContext(CartContext);
   const [menu, setMenu] = useState("shop");
   return (
     <div className="navbar">
       <div className="outline-menu">
-      <AiOutlineMenu />
+        <AiOutlineMenu />
       </div>
-      
+
       <ul className="nav-menu">
         {/* <li
           onClick={() => {
@@ -33,7 +34,7 @@ const Navbar = () => {
           }}
         >
           <Link style={{ textDecoration: "none", color: "grey" }} to="/mens">
-           For Him
+            For Him
           </Link>
           {menu === "mens" ? <hr /> : <></>}
         </li>
@@ -55,10 +56,9 @@ const Navbar = () => {
         </Link>
         {/* <p>SHOP</p> */}
       </div>
-          <div>
-
-     <SearchComponent/>
-          </div>
+      <div>
+        <SearchComponent />
+      </div>
 
       <div className="nav-login-cart">
         <Link to="/login">
@@ -68,7 +68,7 @@ const Navbar = () => {
           {" "}
           <img src={cart_icon} alt="" />
         </Link>
-        <div className="nav-cart-count">0</div>
+        <div className="nav-cart-count">{cart.length}</div>
       </div>
     </div>
   );

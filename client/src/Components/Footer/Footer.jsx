@@ -7,7 +7,7 @@ import playstore from "../Assets/playstore.svg"
 const Footer = () => {
   return (
     <div className="footer">
-      <div className="container">
+      <div className="footer-container">
         <div className="row">
           <div className="col1">
             <section className="col1_section">
