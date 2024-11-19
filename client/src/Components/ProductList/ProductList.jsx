@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import "./ProductList.scss";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { DotLoader } from 'react-spinners';
+
+
+const CACHE_KEY= "productData";
+const TIMESTAMP_KEY= "productDataTimestamp";
+const CACHE_EXPIRY= 60*60*1000; //1 hour in milliseconds
 
 const ProductList = () => {
   const [myData, setMyData] = useState([]);
@@ -10,17 +16,38 @@ const ProductList = () => {
   const [isError, setIsError] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // Function to fetch product data
   const getMyPostData = async () => {
     try {
-      const res = await axios.get("/api/v1/product/get-product");
-      setMyData(res.data.products);
+      // Check if data is already cached in local storage
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const cachedTimestamp= localStorage.getItem(TIMESTAMP_KEY);
+      const now= new Date().getTime();
+
+      if (cachedData && cachedTimestamp && now - cachedTimestamp < CACHE_EXPIRY) {
+        setMyData(JSON.parse(cachedData)); //Use cached data
+        setLoading(false); // Set Loading to false immediately
+        console.log("🚀 ~ getMyPostData ~ cachedData:", cachedData)
+        return;
+       
+      } else {
+
+        // When the data is not at the local storage
+        const res = await axios.get("/api/v1/product/get-product");
+        const productData = res.data.products;
+        console.log("🚀 ~ getMyPostData ~ productData:", productData)
+
+        setMyData(productData);
+        localStorage.setItem(CACHE_KEY, JSON.stringify(productData)); // Cache the fetched data
+        localStorage.setItem(TIMESTAMP_KEY, now.toString()); // Save the current timestamp
+      }
     } catch (error) {
       setIsError("Error fetching product data: " + error.message);
     } finally {
       setLoading(false);
     }
   };
-
+  // Function to fetch category data
   const getCategoriesData = async () => {
     try {
       const res = await axios.get("/api/v1/category/get-category");
@@ -30,9 +57,21 @@ const ProductList = () => {
     }
   };
 
+  const clearOldProductData = () => {
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(TIMESTAMP_KEY);
+  };
+
   useEffect(() => {
     getMyPostData();
     getCategoriesData();
+
+      // Optional: Clear old product data on app startup
+      const cachedTimestamp = localStorage.getItem(TIMESTAMP_KEY);
+      const now = new Date().getTime();
+      if (cachedTimestamp && now - cachedTimestamp >= CACHE_EXPIRY) {
+        clearOldProductData();
+      }
   }, []);
 
   // Filtered and sorted data
@@ -65,12 +104,9 @@ const ProductList = () => {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
+      <DotLoader/>
     );
   }
-
 
   return (
     <div className="product-list">
@@ -108,7 +144,7 @@ const ProductList = () => {
       </div>
 
       <div className="cart-container">
-        {filteredData.map((product) => {
+      {filteredData.map((product) => {
           const { _id, name, price, photo } = product;
           return (
             <Link to={`/product/${_id}`} key={_id} className="card-link">
@@ -119,7 +155,7 @@ const ProductList = () => {
                 <div className="card-name">
                   <h2>{name}</h2>
                 </div>
-                <span className="card-price">Price: ${price}</span>
+                <span className="card-price">Price: रु {price}</span>
               </div>
             </Link>
           );

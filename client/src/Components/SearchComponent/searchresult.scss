@@ -1,0 +1,91 @@
+.searchresult{
+    h2{
+      margin-top: 50px;
+      text-align: center;
+      font-size: 30px;
+      .query-text{
+        color: grey;
+        font-size: 20px;
+      }
+    }
+
+
+.cart-container {
+  display: grid;
+  gap: 16px;
+  margin: 50px;
+  justify-content: center;
+
+  // Fixed width for all cards, no stretching
+  grid-template-columns: repeat(auto-fit, 200px);
+
+  .loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column: span 3; // Span across all columns
+  }
+
+  .no-results {
+    color: red;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 20px;
+    grid-column: span 3; // Span across all columns
+  }
+  a{
+    text-decoration: none;
+    color: #000;
+  }
+
+  .card-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fff;
+    width: 200px; // Fixed width
+    height: auto; // Adjust height to content
+    text-align: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-image {
+      width: 100%;
+      height: 150px; // Fixed height for images
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 12px;
+
+      img {
+        max-width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .card-name {
+      min-height: 40px; // Consistent height for text alignment
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .card-price {
+      min-height: 20px; // Consistent height for prices
+      font-size: 1rem;
+      margin-top: 8px;
+      color: #333;
+    }
+  }
+}
+}

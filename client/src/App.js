@@ -9,6 +9,7 @@ import LoginSignup from "./Pages/LoginSignup";
 import Footer from "./Components/Footer/Footer";
 import SingleProduct from "./Components/SingleProduct/SingleProduct";
 import ProductList from "./Components/ProductList/ProductList";
+import SearchResult from "./Components/SearchComponent/SearchResult";
 
 
 const MainLayout = () => (
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: "cart",
         element: <Cart/>,
+      },
+      {
+        path: "search",
+        element: <SearchResult />
       },
       {
         path: "login",

@@ -1,42 +1,72 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "./singleproduct.scss";
 import { CartContext } from "../../Features/ContextProvider";
-
+import { DotLoader } from 'react-spinners';
 
 const SingleProduct = () => {
-
-const {dispatch}= useContext(CartContext);
+  const { dispatch } = useContext(CartContext);
 
   const { productId } = useParams();
-  const [products, setProducts] = useState([]);
-  const [product, setProduct] = useState(null);
+   const [products, setProducts] = useState([]);  // To store all products
+  const [product, setProduct] = useState(null);  // Single product details
   const [loading, setLoading] = useState(true);
   const [isError, setIsError] = useState("");
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(null);
+  const [similarProducts, setSimilarProducts] = useState([]); // State to store similar products
 
   const fetchAllProducts = async () => {
     try {
+      // Try fetching product from localStorage
+      const storedProducts = JSON.parse(
+        localStorage.getItem("productData") || "[]"
+      );
+
+      if (Array.isArray(storedProducts) && storedProducts.length > 0) {
+        const localProduct = storedProducts.find(
+          (item) => item._id === productId
+        );
+        if (localProduct) {
+          console.log("🚀 Product Found in Local Storage:", localProduct);
+          setProduct(localProduct);
+          setSelectedImage(localProduct.photo);
+          // Find similar products by category
+          const similar = storedProducts.filter(
+            item => item.category.name === localProduct.category.name && item._id !== productId
+          );
+          console.log("🚀 ~ fetchAllProducts ~ similar:", similar)
+          setSimilarProducts(similar);
+          setLoading(false);
+          return; // Stop further execution
+        }
+      }
+      // If not found in localStorage, fetch from API
       const res = await axios.get(`/api/v1/product/get-product`);
-      setProducts(res.data.products);
-
-      //   console.log(setProducts);
-
-      const filteredProduct = res.data.products.find(
+      
+      const apiProduct = res.data.products.find(
         (item) => item._id === productId
       );
-      setProduct(filteredProduct);
-      if (filteredProduct) {
-        setSelectedImage(filteredProduct.photo);
+     
+
+      if (apiProduct) {
+        setProduct(apiProduct);
+        setSelectedImage(apiProduct.photo);
+
+          // Find similar products by category
+          const similar = res.data.products.filter(
+            item => item.category.name === apiProduct.category.name && item._id !== productId
+          );
+          setSimilarProducts(similar);
+        
       } else {
         setIsError("Product not found");
       }
     } catch (error) {
       console.error(error);
-      setIsError("Failed to load products");
+      setIsError("Failed to load product");
     } finally {
       setLoading(false);
     }
@@ -44,13 +74,11 @@ const {dispatch}= useContext(CartContext);
 
   useEffect(() => {
     fetchAllProducts();
-  }, []);
+  }, [productId]);
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner"></div>
-      </div>
+     <DotLoader/>
     );
   }
 
@@ -78,10 +106,10 @@ const {dispatch}= useContext(CartContext);
     .filter((line) => line.trim() !== "")
     .map((line) => line.replace(/^-+\s*/, "").trim());
 
-     // Handle Color Selection
+  // Handle Color Selection
   const handleColorSelect = (color) => {
     setSelectedColor(color);
-    setSelectedImage(color.link);  // Update the main image to match the selected color
+    setSelectedImage(color.link); // Update the main image to match the selected color
   };
 
   const handleAddToCart = () => {
@@ -95,9 +123,10 @@ const {dispatch}= useContext(CartContext);
       type: "AddOrUpdate",
       product: { ...product, quantity, color: selectedColor },
     });
-    }
+  };
 
   return (
+    <>
     <div className="product-detail">
       <div className="product-image-section">
         <div className="main-image">
@@ -106,7 +135,6 @@ const {dispatch}= useContext(CartContext);
             alt={name || "Product"}
           />
         </div>
-        
       </div>
 
       <div className="product-info">
@@ -117,7 +145,7 @@ const {dispatch}= useContext(CartContext);
               <li key={index}>{line}</li>
             ))}
           </ul>
-          <p>Price: ${price}</p>
+          <p>Price: रु {price}</p>
           <p>Shipping: {shipping ? "Available" : "Not available"}</p>
         </div>
 
@@ -140,9 +168,8 @@ const {dispatch}= useContext(CartContext);
                   className="color-swatch"
                   style={{
                     backgroundColor: color.color,
-                  
                   }}
-                  onClick={() =>handleColorSelect(color)}
+                  onClick={() => handleColorSelect(color)}
                 >
                   <img
                     src={color.link}
@@ -150,8 +177,8 @@ const {dispatch}= useContext(CartContext);
                     className="color-image"
                   />
                   {selectedColor?._id === color._id && (
-          <div className="checkmark">&#10003;</div> 
-        )}
+                    <div className="checkmark">&#10003;</div>
+                  )}
                 </div>
               ))
             ) : (
@@ -159,19 +186,45 @@ const {dispatch}= useContext(CartContext);
             )}
           </div>
           <div className="add_cart">
-          <button
+            <button
               className="addtocart"
-              onClick={handleAddToCart}  // Call the function that checks color selection
-              alert={!selectedColor}  // Disable the button if no color is selected
+              onClick={handleAddToCart} // Call the function that checks color selection
+              disabled={!selectedColor} // Disable the button if no color is selected
             >
               Add To Cart
             </button>
-            
+            <div className={`color-message ${!selectedColor ? "visible" : ""}`}>
+              Please select a color before adding to the cart.
+            </div>
+
             <button className="checkout">Buy Now</button>
           </div>
         </div>
       </div>
     </div>
+    
+    {similarProducts.length > 0 && (
+  <div className="similar-products">
+    <h3>Similar Products</h3>
+    <div className="similar-products-list">
+      {similarProducts.slice(0, 4).map((similarProduct) => (
+        <div key={similarProduct._id} className="similar-product-item">
+          {/* Wrap each similar product with a Link component using productId */}
+          <Link to={`/product/${similarProduct._id}`}>
+            <img src={similarProduct.photo} alt={similarProduct.name} />
+            <p>{similarProduct.name}</p>
+            <p>रु {similarProduct.price}</p>
+          </Link>
+          {/* <button>Add to Cart</button> */}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+    
+
+    </>
+    
   );
 };
 

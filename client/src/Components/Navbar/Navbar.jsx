@@ -7,10 +7,12 @@ import { AiOutlineMenu } from "react-icons/ai";
 
 import SearchComponent from "../SearchComponent/SearchComponent";
 import { CartContext } from "../../Features/ContextProvider";
+import SearchModal from "../SearchComponent/SearchComponent";
 
 const Navbar = () => {
   const { cart } = useContext(CartContext);
   const [menu, setMenu] = useState("shop");
+  const [isModalOpen, setModalOpen] = useState(false);
   return (
     <div className="navbar">
       <div className="outline-menu">
@@ -57,7 +59,24 @@ const Navbar = () => {
         {/* <p>SHOP</p> */}
       </div>
       <div>
-        <SearchComponent />
+       <Link > 
+      <button
+        onClick={() => setModalOpen(true)}
+        style={{
+          padding: '10px 20px',
+          backgroundColor: '#007bff',
+          color: '#fff',
+          border: 'none',
+          cursor: 'pointer',
+          alignItems: 'center',
+        }}
+      >
+        Search
+      </button>
+      </Link>
+      {/* Search Modal */}
+      <SearchModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+        {/* <SearchComponent /> */}
       </div>
 
       <div className="nav-login-cart">
