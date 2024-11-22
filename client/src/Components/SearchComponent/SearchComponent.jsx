@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './searchcomponent.scss'
+
 
 const SearchModal = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
@@ -18,38 +20,18 @@ const SearchModal = ({ isOpen, onClose }) => {
   return (
     <div>
       {isOpen && (
-        <div style={{
-          position: 'fixed',
-          top: '0',
-          left: '0',
-          right: '0',
-          bottom: '0',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          zIndex: 1000,
-        }}>
-          <div style={{
-            background: 'white',
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            padding: '20px',
-            width: '80%',
-            maxWidth: '600px',
-            borderRadius: '8px',
-            textAlign: 'center',
-          }}>
-            <button onClick={onClose} style={{ float: 'right', fontSize: '20px' }}>✖</button>
+        <div className='modal-container'>
+          <div className='modal'>
+            <button className='close' onClick={onClose}>✖</button>
             <h2>Search Products</h2>
-            <form onSubmit={handleSearch} style={{ marginBottom: '20px' }}>
+            <form onSubmit={handleSearch}>
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search products..."
-                style={{ width: '80%', padding: '10px', marginRight: '10px' }}
               />
-              <button type="submit" style={{ padding: '10px 20px' }}>Search</button>
+              <button className='search' type="submit">Search</button>
             </form>
           </div>
         </div>

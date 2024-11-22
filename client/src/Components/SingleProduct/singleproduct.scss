@@ -233,7 +233,10 @@
       transform: translateY(-5px);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     }
-
+    a{
+      text-decoration: none;
+      
+    }
     img {
       width: 200px;
       
@@ -245,8 +248,9 @@
     p {
       font-size: 16px;
       font-weight: 500;
-      color: #444;
+      color: black;
       margin: 10px 0;
+      text-decoration: none;
     }
 
     button {

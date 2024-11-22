@@ -1,22 +1,24 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./singleproduct.scss";
 import { CartContext } from "../../Features/ContextProvider";
-import { DotLoader } from 'react-spinners';
+import { DotLoader } from "react-spinners";
+import { MdFavorite } from "react-icons/md";
 
 const SingleProduct = () => {
   const { dispatch } = useContext(CartContext);
-
+  const navigate = useNavigate();
   const { productId } = useParams();
-   const [products, setProducts] = useState([]);  // To store all products
-  const [product, setProduct] = useState(null);  // Single product details
+  const [product, setProduct] = useState(null); // Single product details
   const [loading, setLoading] = useState(true);
   const [isError, setIsError] = useState("");
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]); // State to store similar products
+
+  const [wishlistMessage, setWishlistMessage] = useState(""); // Wishlist message
 
   const fetchAllProducts = async () => {
     try {
@@ -35,9 +37,11 @@ const SingleProduct = () => {
           setSelectedImage(localProduct.photo);
           // Find similar products by category
           const similar = storedProducts.filter(
-            item => item.category.name === localProduct.category.name && item._id !== productId
+            (item) =>
+              item.category.name === localProduct.category.name &&
+              item._id !== productId
           );
-          console.log("🚀 ~ fetchAllProducts ~ similar:", similar)
+          console.log("🚀 ~ fetchAllProducts ~ similar:", similar);
           setSimilarProducts(similar);
           setLoading(false);
           return; // Stop further execution
@@ -45,22 +49,22 @@ const SingleProduct = () => {
       }
       // If not found in localStorage, fetch from API
       const res = await axios.get(`/api/v1/product/get-product`);
-      
+
       const apiProduct = res.data.products.find(
         (item) => item._id === productId
       );
-     
 
       if (apiProduct) {
         setProduct(apiProduct);
         setSelectedImage(apiProduct.photo);
 
-          // Find similar products by category
-          const similar = res.data.products.filter(
-            item => item.category.name === apiProduct.category.name && item._id !== productId
-          );
-          setSimilarProducts(similar);
-        
+        // Find similar products by category
+        const similar = res.data.products.filter(
+          (item) =>
+            item.category.name === apiProduct.category.name &&
+            item._id !== productId
+        );
+        setSimilarProducts(similar);
       } else {
         setIsError("Product not found");
       }
@@ -76,10 +80,31 @@ const SingleProduct = () => {
     fetchAllProducts();
   }, [productId]);
 
-  if (loading) {
-    return (
-     <DotLoader/>
+  const handleAddToWishlist = () => {
+    const token = localStorage.getItem("jwtToken"); // Check if user is logged in
+    if (!token) {
+      setWishlistMessage("Please log in to add to your wishlist.");
+      setTimeout(() => navigate("/login"), 2000); // Redirect to login after 2 seconds
+      return;
+    }
+
+    // Add product to wishlist in localStorage (or a global state if needed)
+    const storedWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    const productExists = storedWishlist.some(
+      (item) => item._id === product._id
     );
+
+    if (!productExists) {
+      storedWishlist.push(product);
+      localStorage.setItem("wishlist", JSON.stringify(storedWishlist));
+      setWishlistMessage("Product added to your wishlist!");
+    } else {
+      setWishlistMessage("Product is already in your wishlist.");
+    }
+  };
+
+  if (loading) {
+    return <DotLoader />;
   }
 
   if (isError) return <div className="error">{isError}</div>;
@@ -127,104 +152,111 @@ const SingleProduct = () => {
 
   return (
     <>
-    <div className="product-detail">
-      <div className="product-image-section">
-        <div className="main-image">
-          <img
-            src={selectedImage || "/path/to/default-image.jpg"}
-            alt={name || "Product"}
-          />
-        </div>
-      </div>
-
-      <div className="product-info">
-        <h2>{name || "Unnamed Product"}</h2>
-        <div className="description">
-          <ul>
-            {descriptionList.map((line, index) => (
-              <li key={index}>{line}</li>
-            ))}
-          </ul>
-          <p>Price: रु {price}</p>
-          <p>Shipping: {shipping ? "Available" : "Not available"}</p>
-        </div>
-
-        <div className="quantity-selector">
-          <div className="quantity">
-            <p>Quantity:</p> <br />
-            <button onClick={() => handleQuantityChange(-1)}>-</button>
-            <input type="number" value={quantity} />
-            <button onClick={() => handleQuantityChange(1)}>+</button>
+      <div className="product-detail">
+        <div className="product-image-section">
+          <div className="main-image">
+            <img
+              src={selectedImage || "/path/to/default-image.jpg"}
+              alt={name || "Product"}
+            />
           </div>
         </div>
 
-        <div className="color-options">
-          <p>Available Colors:</p>
-          <div className="color-list">
-            {colors.length > 0 ? (
-              colors.map((color) => (
-                <div
-                  key={color._id}
-                  className="color-swatch"
-                  style={{
-                    backgroundColor: color.color,
-                  }}
-                  onClick={() => handleColorSelect(color)}
-                >
-                  <img
-                    src={color.link}
-                    alt={color.color}
-                    className="color-image"
-                  />
-                  {selectedColor?._id === color._id && (
-                    <div className="checkmark">&#10003;</div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p>No colors available.</p>
-            )}
+        <div className="product-info">
+          <h2>{name || "Unnamed Product"}</h2>
+          <div className="description">
+            <ul>
+              {descriptionList.map((line, index) => (
+                <li key={index}>{line}</li>
+              ))}
+            </ul>
+            <p>Price: रु {price}</p>
+            <p>Shipping: {shipping ? "Available" : "Not available"}</p>
           </div>
-          <div className="add_cart">
-            <button
-              className="addtocart"
-              onClick={handleAddToCart} // Call the function that checks color selection
-              disabled={!selectedColor} // Disable the button if no color is selected
-            >
-              Add To Cart
-            </button>
-            <div className={`color-message ${!selectedColor ? "visible" : ""}`}>
-              Please select a color before adding to the cart.
+
+          <div className="quantity-selector">
+            <div className="quantity">
+              <p>Quantity:</p> <br />
+              <button onClick={() => handleQuantityChange(-1)}>-</button>
+              <input type="number" value={quantity} readOnly />
+              <button onClick={() => handleQuantityChange(1)}>+</button>
             </div>
+          </div>
 
-            <button className="checkout">Buy Now</button>
+          <div className="color-options">
+            <p>Available Colors:</p>
+            <div className="color-list">
+              {colors.length > 0 ? (
+                colors.map((color) => (
+                  <div
+                    key={color._id}
+                    className="color-swatch"
+                    style={{
+                      backgroundColor: color.color,
+                    }}
+                    onClick={() => handleColorSelect(color)}
+                  >
+                    <img
+                      src={color.link}
+                      alt={color.color}
+                      className="color-image"
+                    />
+                    {selectedColor?._id === color._id && (
+                      <div className="checkmark">&#10003;</div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p>No colors available.</p>
+              )}
+            </div>
+            <div className="add_cart">
+              <button
+                className="addtocart"
+                onClick={handleAddToCart} // Call the function that checks color selection
+                disabled={!selectedColor} // Disable the button if no color is selected
+              >
+                Add To Cart
+              </button>
+              <div
+                className={`color-message ${!selectedColor ? "visible" : ""}`}
+              >
+                Please select a color before adding to the cart.
+              </div>
+
+              <button
+                className="wishlist"
+                aria-label="Add to Wishlist"
+                onClick={handleAddToWishlist}
+                disabled={!localStorage.getItem("jwtToken")}
+              >
+                <MdFavorite />
+              </button>
+
+              <button className="checkout">Buy Now</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    
-    {similarProducts.length > 0 && (
-  <div className="similar-products">
-    <h3>Similar Products</h3>
-    <div className="similar-products-list">
-      {similarProducts.slice(0, 4).map((similarProduct) => (
-        <div key={similarProduct._id} className="similar-product-item">
-          {/* Wrap each similar product with a Link component using productId */}
-          <Link to={`/product/${similarProduct._id}`}>
-            <img src={similarProduct.photo} alt={similarProduct.name} />
-            <p>{similarProduct.name}</p>
-            <p>रु {similarProduct.price}</p>
-          </Link>
-          {/* <button>Add to Cart</button> */}
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-    
 
+      {similarProducts.length > 0 && (
+        <div className="similar-products">
+          <h3>Similar Products</h3>
+          <div className="similar-products-list">
+            {similarProducts.slice(0, 4).map((similarProduct) => (
+              <div key={similarProduct._id} className="similar-product-item">
+                {/* Wrap each similar product with a Link component using productId */}
+                <Link to={`/product/${similarProduct._id}`}>
+                  <img src={similarProduct.photo} alt={similarProduct.name} />
+                  <p>{similarProduct.name}</p>
+                  <p>रु {similarProduct.price}</p>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </>
-    
   );
 };
 
