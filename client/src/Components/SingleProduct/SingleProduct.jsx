@@ -5,9 +5,13 @@ import "./singleproduct.scss";
 import { CartContext } from "../../Features/ContextProvider";
 import { DotLoader } from "react-spinners";
 import { MdFavorite } from "react-icons/md";
+import { useWishlist } from "../../Features/WishlistContext"; // Import WishlistContext
+import { useAuth } from "../../Features/AuthContext"; // Import useAuth from AuthContext
 
 const SingleProduct = () => {
   const { dispatch } = useContext(CartContext);
+  const { handleWishlist } = useWishlist(); // Use the handleWishlist function
+  const { isAuthenticated, logout } = useAuth(); // Get authentication status from AuthContext
   const navigate = useNavigate();
   const { productId } = useParams();
   const [product, setProduct] = useState(null); // Single product details
@@ -17,7 +21,6 @@ const SingleProduct = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(null);
   const [similarProducts, setSimilarProducts] = useState([]); // State to store similar products
-
   const [wishlistMessage, setWishlistMessage] = useState(""); // Wishlist message
 
   const fetchAllProducts = async () => {
@@ -32,21 +35,19 @@ const SingleProduct = () => {
           (item) => item._id === productId
         );
         if (localProduct) {
-          console.log("🚀 Product Found in Local Storage:", localProduct);
           setProduct(localProduct);
           setSelectedImage(localProduct.photo);
-          // Find similar products by category
           const similar = storedProducts.filter(
             (item) =>
               item.category.name === localProduct.category.name &&
               item._id !== productId
           );
-          console.log("🚀 ~ fetchAllProducts ~ similar:", similar);
           setSimilarProducts(similar);
           setLoading(false);
-          return; // Stop further execution
+          return;
         }
       }
+
       // If not found in localStorage, fetch from API
       const res = await axios.get(`/api/v1/product/get-product`);
 
@@ -58,7 +59,6 @@ const SingleProduct = () => {
         setProduct(apiProduct);
         setSelectedImage(apiProduct.photo);
 
-        // Find similar products by category
         const similar = res.data.products.filter(
           (item) =>
             item.category.name === apiProduct.category.name &&
@@ -81,26 +81,16 @@ const SingleProduct = () => {
   }, [productId]);
 
   const handleAddToWishlist = () => {
-    const token = localStorage.getItem("jwtToken"); // Check if user is logged in
-    if (!token) {
+    if (!isAuthenticated) { // Check if the user is authenticated
       setWishlistMessage("Please log in to add to your wishlist.");
       setTimeout(() => navigate("/login"), 2000); // Redirect to login after 2 seconds
       return;
     }
 
-    // Add product to wishlist in localStorage (or a global state if needed)
-    const storedWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    const productExists = storedWishlist.some(
-      (item) => item._id === product._id
-    );
-
-    if (!productExists) {
-      storedWishlist.push(product);
-      localStorage.setItem("wishlist", JSON.stringify(storedWishlist));
-      setWishlistMessage("Product added to your wishlist!");
-    } else {
-      setWishlistMessage("Product is already in your wishlist.");
-    }
+    // Use handleWishlist function from context
+    handleWishlist(product);
+    // setWishlistMessage("Product added to your wishlist!");
+    setTimeout(() => setWishlistMessage(""), 3000); // Clear message after 3 seconds
   };
 
   if (loading) {
@@ -114,7 +104,6 @@ const SingleProduct = () => {
     name,
     description,
     price,
-
     photo,
     photo1,
     photo2,
@@ -138,7 +127,7 @@ const SingleProduct = () => {
   };
 
   const handleAddToCart = () => {
-    console.log("Selected Color:", selectedColor);
+    console.log("Select color before check:", selectedColor);
     if (!selectedColor) {
       alert("Please select a color before adding to the cart");
       return;
@@ -213,22 +202,17 @@ const SingleProduct = () => {
             <div className="add_cart">
               <button
                 className="addtocart"
-                onClick={handleAddToCart} // Call the function that checks color selection
-                disabled={!selectedColor} // Disable the button if no color is selected
+                onClick={handleAddToCart}
+                disabled={!selectedColor}
               >
                 Add To Cart
               </button>
-              <div
-                className={`color-message ${!selectedColor ? "visible" : ""}`}
-              >
-                Please select a color before adding to the cart.
-              </div>
 
               <button
                 className="wishlist"
                 aria-label="Add to Wishlist"
                 onClick={handleAddToWishlist}
-                disabled={!localStorage.getItem("jwtToken")}
+                disabled={!localStorage.getItem("authToken")}
               >
                 <MdFavorite />
               </button>
@@ -239,13 +223,14 @@ const SingleProduct = () => {
         </div>
       </div>
 
+      {wishlistMessage && <div className="wishlist-message">{wishlistMessage}</div>}
+
       {similarProducts.length > 0 && (
         <div className="similar-products">
           <h3>Similar Products</h3>
           <div className="similar-products-list">
             {similarProducts.slice(0, 4).map((similarProduct) => (
               <div key={similarProduct._id} className="similar-product-item">
-                {/* Wrap each similar product with a Link component using productId */}
                 <Link to={`/product/${similarProduct._id}`}>
                   <img src={similarProduct.photo} alt={similarProduct.name} />
                   <p>{similarProduct.name}</p>

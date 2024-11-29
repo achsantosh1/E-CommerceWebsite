@@ -43,7 +43,7 @@ const Navbar = ({isLoggedIn, handleLogout}) => {
           </Link>
           {menu === "womens" ? <hr /> : <></>}
         </li>
-        {/* <li onClick={()=>{setMenu('kids')}}><Link style={{textDecoration:'none',color:'grey'}} to='kids'>Kids</Link>{ menu==='kids'? <hr/>: <></>}</li> */}
+        <li onClick={()=>{setMenu('wishlist')}}><Link style={{textDecoration:'none',color:'grey'}} to='wishlist'>Wishlist</Link>{ menu==='kids'? <hr/>: <></>}</li>
       </ul>
       <div className="nav-logo">
         <Link to="/">

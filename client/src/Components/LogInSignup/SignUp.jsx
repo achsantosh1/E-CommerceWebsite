@@ -9,12 +9,21 @@ const SignUp = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleSignup = () => {
+  // Function to check if the user already exists in localStorage
+  const isUserExist = (email) => {
     const users = JSON.parse(localStorage.getItem("users")) || {};
-    if (users[email]) {
+    return users[email]; // Return true if user exists, else false
+  };
+
+  const handleSignup = () => {
+    // Check if the email already exists using the helper function
+    if (isUserExist(email)) {
       setMessage("User already exists!");
     } else {
-      users[email] = { username, password };
+      // Store new user data with email as the key
+      const users = JSON.parse(localStorage.getItem("users")) || {};
+      users[email] = { username, email, password };
+
       localStorage.setItem("users", JSON.stringify(users));
       setMessage("Signup successful! Redirecting to Login...");
       setTimeout(() => navigate("/login"), 2000); // Redirect after 2 seconds

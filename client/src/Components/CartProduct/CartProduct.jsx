@@ -66,7 +66,7 @@ const CartProduct = ({ product, onRemove }) => {
       </td>
 
       <td className="cart-subtotal">
-        <p>${subtotal}</p>
+        <p>रू{subtotal}</p>
       </td>
 
       <td className="cart-remove">

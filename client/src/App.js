@@ -9,34 +9,29 @@ import ProductList from "./Components/ProductList/ProductList";
 import SearchResult from "./Components/SearchComponent/SearchResult";
 import LogIn from "./Components/LogInSignup/LogIn";
 import SignUp from "./Components/LogInSignup/SignUp";
-import { useEffect, useState } from "react";
 import Wishlist from "./Components/Wishlist/Wishlist";
+import { AuthProvider, useAuth } from '../src/Features/AuthContext' // Import AuthContext
+import { WishListProvider } from "./Features/WishlistContext";
+import CheckOut from "./Components/Checkout/CheckOut";
 
-const MainLayout = ({isLoggedIn, handleLogout}) => (
-  <>
-    <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout}/>
-    <Outlet />
-    <Footer />
-  </>
-);
+// Main Layout component
+const MainLayout = () => {
+  const { isAuthenticated, logout } = useAuth(); // Use AuthContext values
+  return (
+    <>
+      <Navbar isLoggedIn={isAuthenticated} handleLogout={logout} />
+      <Outlet />
+      <Footer />
+    </>
+  );
+};
 
+// App component
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    // Check if user is logged in from localStorage
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    setIsLoggedIn(!!loggedInUser);
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("loggedInUser"); // Clear the logged-in user from localStorage
-    setIsLoggedIn(false); // Update state to logged out
-  };
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <MainLayout isLoggedIn={isLoggedIn}  handleLogout={handleLogout}/>,
+      element: <MainLayout />, // Pass MainLayout directly
       children: [
         {
           index: true,
@@ -50,10 +45,6 @@ const App = () => {
           path: "womens",
           element: <ShopCategory category="women" />,
         },
-        // {
-        //   path: "kids",
-        //   element: <ShopCategory category="kid" />,
-        // },
         { path: "/", element: <ProductList /> },
         { path: "/product/:productId", element: <SingleProduct /> },
         {
@@ -66,7 +57,7 @@ const App = () => {
         },
         {
           path: "login",
-          element: <LogIn  setIsLoggedIn={setIsLoggedIn}/>,
+          element: <LogIn />, // No need to pass setIsLoggedIn
         },
         {
           path: "signup",
@@ -76,11 +67,24 @@ const App = () => {
           path: "wishlist",
           element: <Wishlist />,
         },
+        {
+          path: "checkout",
+          element: <CheckOut />,
+        },
       ],
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider> 
+     <WishListProvider>
+      <RouterProvider router={router} />
+
+     </WishListProvider>
+
+     
+    </AuthProvider>
+  );
 };
 
 export default App;
