@@ -1,25 +1,112 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { TiTick } from "react-icons/ti";
 import { useForm } from "react-hook-form";
-import "./checkout.scss";
 import { CartContext } from "../../Features/ContextProvider";
+import { useAuth } from "../../Features/AuthContext";
+import "./checkout.scss";
+import { useBilling } from "../../Features/BillingContext";
+import { useNavigate } from "react-router-dom";
 
 const CheckOut = () => {
-  const { cart } = useContext(CartContext);
-//   console.log("🚀 ~ CheckOut ~ cart:", cart);
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const { cart, dispatch } = useContext(CartContext);
+  //   console.log("🚀 ~ CheckOut ~ cart:", cart);
+  const { billingAddress } = useBilling();
+  // console.log("🚀 ~ CheckOut ~ billingAddress:", billingAddress)
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     getValues,
+    reset,
   } = useForm();
 
   const [isSameAddress, setIsSameAddress] = useState(false);
 
+  // Initialize orderData in localStorage as an array
+  useEffect(() => {
+    const existingOrders = JSON.parse(localStorage.getItem("orderData"));
+    if (!existingOrders) {
+      localStorage.setItem("orderData", JSON.stringify([]));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (billingAddress && isAuthenticated) {
+      setValue("fullName", billingAddress.name || "");
+      setValue("email", billingAddress.email || "");
+      setValue("phone", billingAddress.phone || "");
+      setValue("address", billingAddress.address || "");
+      setValue("city", billingAddress.city || "");
+      setValue("region", billingAddress.region || "");
+      setValue("country", billingAddress.country || "Nepal");
+    } else {
+      reset({});
+    }
+  }, [setValue, user, isAuthenticated, billingAddress, reset]);
+
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
+    const orderData = {
+      userId: isAuthenticated ? user?.email : "",
+      billingDetails: {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        region: data.region,
+        country: data.country,
+      },
+      shippingDetails: isSameAddress
+        ? { ...data } // If shipping is same as billing, use billing details
+        : {
+            fullName: data.shippingFullName,
+            email: data.shippingEmail,
+            phone: data.shippingPhone,
+            address: data.shippingAddress,
+            city: data.shippingCity,
+            region: data.shippingRegion,
+            country: data.shippingCountry,
+          },
+      cartItems: cart.map((item) => ({
+        name: item.name, // Send only the product name
+        price: item.price, // Send only the price
+        quantity: item.quantity, // Send the quantity
+        color: item.color.color, // Send the color of the item (assuming it's an object with a `color` property)
+      })),
+      orderTotal: subtotal,
+      date: new Date(),
+    };
+
+    console.log("Order Data:", orderData);
+
+    // Retrieve existing orders
+    const existingOrders = JSON.parse(localStorage.getItem("orderData"));
+
+    // If `existingOrders` is not an array, replace it with an empty array
+    if (!Array.isArray(existingOrders)) {
+      console.error("Order data in localStorage is not an array. Resetting.");
+      localStorage.setItem("orderData", JSON.stringify([]));
+    }
+    // Add new order to the array
+    existingOrders.push(orderData);
+
+    // Save updated orders to localStorage
+    localStorage.setItem("orderData", JSON.stringify(existingOrders));
+
+    // dispatch({ type: "CLEAR_CART" });
+    // reset();
+    // navigate('/');
+
+    alert("Order Placed");
   };
+
+  const subtotal = cart.reduce(
+    (acc, product) => acc + product.quantity * product.price,
+    0
+  );
 
   const handleSameAddressChange = () => {
     setIsSameAddress((prev) => !prev);
@@ -291,7 +378,6 @@ const CheckOut = () => {
             </div>
           </div>
 
-          
           <div className="checkoutdetail">
             <table className="cart-table">
               <thead>
@@ -346,6 +432,19 @@ const CheckOut = () => {
                 })}
               </tbody>
             </table>
+            <div className="checkout-wrapper">
+              <div className="checkout-box">
+                <h2 className="checkout-heading">Cart Totals</h2>
+                <div className="checkout-row">
+                  <span>Subtotal:</span>
+                  <span>रू {subtotal}</span>
+                </div>
+                <div className="checkout-row">
+                  <span>Total:</span>
+                  <span>रू {subtotal}</span>
+                </div>
+              </div>
+            </div>
             <button type="submit">Place Order</button>
           </div>
         </form>

@@ -74,7 +74,11 @@ const Cart = () => {
               <span>Total:</span>
               <span>रू {subtotal}</span>
             </div>
-            <Link to='/checkout'><button className="checkout-button">Proceed to Checkout</button></Link>
+            {cart.length > 0 && (
+              <Link to="/checkout">
+                <button className="checkout-button">Proceed to Checkout</button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

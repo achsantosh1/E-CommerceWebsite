@@ -6,7 +6,6 @@
   justify-content: center;
   align-items: center;
 
-
   .product-image-section {
     flex: 1 1 300px;
     max-width: 400px;
@@ -138,56 +137,62 @@
     }
 
     .add_cart {
-      display: flex;
-      gap: 10px;
+      display: flex; /* Align buttons in a row */
+      gap: 10px; /* Space between buttons */
       margin-top: 20px;
-      position: relative;
-      // .addtocart:disabled {
-      //   pointer-events: none;  // Prevents any clicks
-      //   opacity: 0.5;          // Optional: visually indicate it's disabled
-      // }
-      .addtocart:disabled + .color-message {
-        visibility: hidden;  // Hide message by default
-        transition: opacity 0.3s ease;
+      align-items: center; /* Vertically center the buttons */
+
+      .addtocart-wrapper {
+        position: relative; /* Ensure the message is positioned relative to the button */
       }
-    
-      .addtocart:disabled:hover + .color-message {
-        visibility: visible;  // Show message only when hovered
-        opacity: 1;
-      }
-    
+
+      /* Color message style */
       .color-message {
-        position: absolute;
-        top: -30px;  // Position above the button
-        left: 0;
-        background-color: #f44336;  // Red background for message
-        color: white;
-        padding: 5px;
+        display: none;
+        color: red;
         font-size: 12px;
-        border-radius: 3px;
-        width: 200px;
-        text-align: center;
-        visibility: hidden;
-        opacity: 0;  // Hidden by default
-        transition: opacity 0.3s ease;
+        margin-top: 5px;
+        position: absolute;
+        top: 100%; /* Position the message below the button */
+        left: 0;
+        font-weight: bold;
+        white-space: nowrap;
+        z-index: 10; /* Ensure it's above other elements */
       }
-    
-      
+
+      /* Show color message when hovering over the Add to Cart button wrapper */
+      .addtocart-wrapper:hover .color-message {
+        display: block;
+      }
+
+      .addtocart:disabled {
+        pointer-events: none; /* Prevents any clicks */
+        opacity: 0.5; /* Optionally visually indicate it's disabled */
+      }
+
       .addtocart,
       .checkout {
         padding: 10px 20px;
         font-size: 1rem;
         font-weight: bold;
         color: #fff;
-        background-color: #007bff;
+        background-color: #007bff; /* Blue background */
         border: none;
         border-radius: 5px;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        width: 100%; /* Optional: adjust width of the buttons */
+        max-width: 150px; /* Optional: ensure buttons don’t get too wide */
+      }
 
-        &:hover {
-          background-color: #0056b3;
-        }
+      /* Add to Cart button hover */
+      .addtocart:hover {
+        background-color: #0056b3;
+      }
+
+      /* Checkout button hover */
+      .checkout:hover {
+        background-color: #0056b3;
       }
     }
   }
@@ -217,11 +222,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: flex-start;  // Align products to the start of the row
+    justify-content: flex-start; // Align products to the start of the row
   }
 
   .similar-product-item {
-   
     background-color: #fff;
     padding: 15px;
     border-radius: 8px;
@@ -233,13 +237,12 @@
       transform: translateY(-5px);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     }
-    a{
+    a {
       text-decoration: none;
-      
     }
     img {
       width: 200px;
-      
+
       height: auto;
       border-radius: 6px;
       object-fit: cover;
@@ -250,7 +253,6 @@
       font-weight: 500;
       color: black;
       margin: 10px 0;
-    
     }
 
     button {
@@ -272,6 +274,4 @@
       }
     }
   }
-
 }
-

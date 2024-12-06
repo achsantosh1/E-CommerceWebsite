@@ -1,0 +1,36 @@
+.not-found {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8f8f8;
+    text-align: center;
+  
+    h1 {
+      font-size: 100px;
+      margin: 0;
+      color: #e74c3c;
+    }
+  
+    h2 {
+      font-size: 24px;
+      margin: 10px 0;
+    }
+  
+    p {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  
+    a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: bold;
+  
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  

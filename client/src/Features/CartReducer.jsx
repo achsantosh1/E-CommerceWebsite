@@ -3,7 +3,7 @@ const CartReducer = (state = [], action) => {
     // case "Add":
     //   return [...state, action.product];
 
-     case "AddOrUpdate":
+    case "AddOrUpdate":
       // Check if the product with the same ID and color is already in the cart
       const existingProductIndex = state.findIndex(
         (product) =>
@@ -18,36 +18,44 @@ const CartReducer = (state = [], action) => {
             ? {
                 ...product,
                 quantity: product.quantity + action.product.quantity,
-                total: (product.quantity + action.product.quantity) * product.price,
+                total:
+                  (product.quantity + action.product.quantity) * product.price,
               }
             : product
         );
       }
 
       // If the product is not in the cart, add it as a new item
-      return [...state, { ...action.product, total: action.product.price * action.product.quantity }];
+      return [
+        ...state,
+        {
+          ...action.product,
+          total: action.product.price * action.product.quantity,
+        },
+      ];
 
+    case "Increase":
+      return state.map((product) =>
+        product._id === action.id && product.color._id === action.colorId
+          ? { ...product, quantity: product.quantity + 1 }
+          : product
+      );
 
+    case "Decrease":
+      return state.map((product) =>
+        product._id === action.id && product.color._id === action.colorId
+          ? { ...product, quantity: Math.max(1, product.quantity - 1) }
+          : product
+      );
 
-      case "Increase":
-        return state.map((product) =>
-          product._id === action.id && product.color._id === action.colorId
-            ? { ...product, quantity: product.quantity + 1 }
-            : product
-        );
-  
-      case "Decrease":
-        return state.map((product) =>
-          product._id === action.id && product.color._id === action.colorId
-            ? { ...product, quantity: Math.max(1, product.quantity - 1) }
-            : product
-        );
+    case "Remove":
+      return state.filter(
+        (product) =>
+          !(product._id === action.id && product.color._id === action.colorId)
+      );
 
-      case "Remove":
-
-        return state.filter(
-          (product) => !(product._id === action.id && product.color._id === action.colorId)
-        );
+    case "CLEAR_CART":
+      return [];
 
     default:
       return state;

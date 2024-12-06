@@ -11,7 +11,7 @@ import { useAuth } from "../../Features/AuthContext"; // Import useAuth from Aut
 const SingleProduct = () => {
   const { dispatch } = useContext(CartContext);
   const { handleWishlist } = useWishlist(); // Use the handleWishlist function
-  const { isAuthenticated, logout } = useAuth(); // Get authentication status from AuthContext
+  const { isAuthenticated } = useAuth(); // Get authentication status from AuthContext
   const navigate = useNavigate();
   const { productId } = useParams();
   const [product, setProduct] = useState(null); // Single product details
@@ -81,7 +81,8 @@ const SingleProduct = () => {
   }, [productId]);
 
   const handleAddToWishlist = () => {
-    if (!isAuthenticated) { // Check if the user is authenticated
+    if (!isAuthenticated) {
+      // Check if the user is authenticated
       setWishlistMessage("Please log in to add to your wishlist.");
       setTimeout(() => navigate("/login"), 2000); // Redirect to login after 2 seconds
       return;
@@ -131,6 +132,8 @@ const SingleProduct = () => {
     if (!selectedColor) {
       alert("Please select a color before adding to the cart");
       return;
+    } else {
+      alert("Item added to cart");
     }
 
     dispatch({
@@ -200,13 +203,20 @@ const SingleProduct = () => {
               )}
             </div>
             <div className="add_cart">
-              <button
-                className="addtocart"
-                onClick={handleAddToCart}
-                disabled={!selectedColor}
-              >
-                Add To Cart
-              </button>
+              <div className="addtocart-wrapper">
+                <button
+                  className="addtocart"
+                  onClick={handleAddToCart}
+                  disabled={!selectedColor}
+                >
+                  Add To Cart
+                </button>
+                {!selectedColor && (
+                  <span className="color-message">
+                    Please select a color before adding to the cart
+                  </span>
+                )}
+              </div>
 
               <button
                 className="wishlist"
@@ -223,7 +233,9 @@ const SingleProduct = () => {
         </div>
       </div>
 
-      {wishlistMessage && <div className="wishlist-message">{wishlistMessage}</div>}
+      {wishlistMessage && (
+        <div className="wishlist-message">{wishlistMessage}</div>
+      )}
 
       {similarProducts.length > 0 && (
         <div className="similar-products">

@@ -10,9 +10,13 @@ import SearchResult from "./Components/SearchComponent/SearchResult";
 import LogIn from "./Components/LogInSignup/LogIn";
 import SignUp from "./Components/LogInSignup/SignUp";
 import Wishlist from "./Components/Wishlist/Wishlist";
-import { AuthProvider, useAuth } from '../src/Features/AuthContext' // Import AuthContext
+import { AuthProvider, useAuth } from "../src/Features/AuthContext"; // Import AuthContext
 import { WishListProvider } from "./Features/WishlistContext";
 import CheckOut from "./Components/Checkout/CheckOut";
+import UserProfile from "./Components/userprofile/UserProfile";
+import NotFound from "./Components/NotFound/NotFound";
+import { BillingProvider } from "./Features/BillingContext";
+import OrderHistory from "./Components/OrderHistory/OrderHistory";
 
 // Main Layout component
 const MainLayout = () => {
@@ -45,8 +49,14 @@ const App = () => {
           path: "womens",
           element: <ShopCategory category="women" />,
         },
-        { path: "/", element: <ProductList /> },
-        { path: "/product/:productId", element: <SingleProduct /> },
+        {
+          path: "/",
+          element: <ProductList />,
+        },
+        {
+          path: "/product/:productId",
+          element: <SingleProduct />,
+        },
         {
           path: "cart",
           element: <Cart />,
@@ -71,18 +81,29 @@ const App = () => {
           path: "checkout",
           element: <CheckOut />,
         },
+        {
+          path: "userprofile",
+          element: <UserProfile />,
+        },
+        {
+          path: "orderhistory",
+          element: <OrderHistory />,
+        },
+        {
+          path: "*",
+          element: <NotFound />,
+        },
       ],
     },
   ]);
 
   return (
-    <AuthProvider> 
-     <WishListProvider>
-      <RouterProvider router={router} />
-
-     </WishListProvider>
-
-     
+    <AuthProvider>
+      <BillingProvider>
+        <WishListProvider>
+          <RouterProvider router={router} />
+        </WishListProvider>
+      </BillingProvider>
     </AuthProvider>
   );
 };
